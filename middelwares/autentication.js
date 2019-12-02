@@ -7,7 +7,10 @@ let SEED = require('../config/config').SEED;
 let verificaToken = (req, res, next) => {
 
     // Recibe el token par url
-    let token = req.query.token;
+    // let token = req.query.token;
+
+    //Optenemos el token de la (CABECERA) de la petición
+    let token = req.get('token-usuario');
 
     // decoded tiene los datos del usuario logueado
     jwt.verify(token, SEED, (err, decoded) => {
