@@ -19,6 +19,18 @@ let usuarioSchema = new Schema({
         unique: [true, 'El correo es necesario'],
         required: true
     },
+    telefono: {
+        type: String,
+        required: [true, 'El teléfono es necesario']
+    },
+    genero: {
+        type: String,
+        required: [true, 'El género es necesario']
+    },
+    nacimiento: {
+        type: String,
+        required: false
+    },
     img: {
         type: String,
         required: false
@@ -27,11 +39,19 @@ let usuarioSchema = new Schema({
         type: String,
         required: false
     },
-    nacimiento: {
+    codigoPostal: {
         type: String,
         required: false
     },
-    angiguedad: {
+    ciudad: {
+        type: String,
+        required: false
+    },
+    provincia: {
+        type: String,
+        required: false
+    },
+    antiguedad: {
         type: String,
         required: false
     },

@@ -2,7 +2,7 @@ const express = require('express');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
-const SEED = require('../config/config').SEED;
+// const SEED = require('../config/config').SEED;
 
 
 const app = express();
@@ -13,7 +13,7 @@ app.post('/', (req, res) => {
 
     const body = req.body;
 
-    Medico.findOne({ nombre: body.nombre }, (err, usuarioDB) => {
+    Medico.findOne({ email: body.email }, (err, usuarioDB) => {
 
         if (err) {
             return res.status(500).json({
@@ -25,7 +25,7 @@ app.post('/', (req, res) => {
         if (!usuarioDB) {
             return res.status(400).json({
                 ok: false,
-                message: 'Creedenciales incorrectas - email',
+                message: 'No se encuentra el usuario en la base de datos',
                 errors: err
             });
         }
@@ -33,7 +33,7 @@ app.post('/', (req, res) => {
         if (!bcrypt.compareSync(body.password, usuarioDB.password)) {
             return res.status(400).json({
                 ok: false,
-                message: 'Creedenciales incorrectas - password',
+                message: 'Email o contraseña incorrecto!!',
                 errors: err
             });
 
@@ -43,7 +43,9 @@ app.post('/', (req, res) => {
         usuarioDB.password = ':)';
         const token = jwt.sign({
             usuario: usuarioDB
-        }, SEED, { expiresIn: '24h' });
+        }, process.env.SEED);
+        // Quitamos el parámetro expiresIn para que no caduque
+        // , { expiresIn: '24d' }
 
 
         res.status(200).json({

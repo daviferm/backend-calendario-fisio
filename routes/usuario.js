@@ -43,11 +43,66 @@ app.get('/', function(req, res) {
                 })
 
             });
-
-
-
         })
 });
+app.get('/total', (req, res) => {
+
+    Usuario.find()
+        .exec((err, usuarios) => {
+
+            if (err) {
+                return res.status(500).json({
+                    ok: false,
+                    message: 'Error cargando todos los usuarios',
+                    errors: err
+                });
+            }
+
+            Usuario.countDocuments((err, conteo) => {
+
+                res.status(200).json({
+                    ok: true,
+                    usuarios,
+                    total: conteo
+
+                })
+
+            });
+        })
+
+})
+
+//=================================================
+// Buscar usuario por su id
+//=================================================
+app.get('/:id', verificaToken, function(req, res) {
+
+    let id = req.params.id;
+
+    Usuario.findById(id, (err, usuario) => {
+        if (err) {
+            return res.status(500).json({
+                ok: false,
+                menssage: 'Error al buscar usuario',
+                err
+            });
+        }
+        if (usuario.value === null) {
+            return res.status(400).json({
+                ok: false,
+                menssage: 'El usuario con el ' + id + ' no existe.',
+                errors: { menssage: 'No existe un usuario con ese id' }
+            });
+        }
+
+        return res.status(200).json({
+            ok: true,
+            usuario
+        })
+
+    })
+
+})
 
 //=================================================
 // Actualizar usuarios
@@ -72,7 +127,7 @@ app.put('/:id', verificaToken, function(req, res) {
             });
         }
 
-        let body = _.pick(req.body, ['nombre', 'apellidos', 'email', 'img', 'direccion', 'nacimiento', 'angiguedad', 'observaciones']);
+        let body = _.pick(req.body, ['nombre', 'apellidos', 'email', 'img', 'direccion', 'ciudad', 'provincia', 'codigoPostal', 'nacimiento', 'angiguedad', 'observaciones', 'telefono']);
 
         Usuario.findByIdAndUpdate(id, body, { new: true }, (err, usuarioDB) => {
 
@@ -105,11 +160,16 @@ app.post('/', verificaToken, function(req, res) {
         nombre: body.nombre,
         apellidos: body.apellidos,
         email: body.email,
+        telefono: body.telefono,
+        genero: body.genero,
+        nacimiento: body.nacimiento,
         img: body.img,
         direccion: body.direccion,
-        nacimiento: body.nacimiento,
+        codigoPostal: body.codigoPostal,
+        ciudad: body.ciudad,
+        provincia: body.provincia,
         antiguedad: body.antiguedad,
-        observaciones: body.observaciones
+        observaciones: body.observaciones,
     });
 
     usuario.save((err, usuarioGuardado) => {
@@ -120,7 +180,6 @@ app.post('/', verificaToken, function(req, res) {
                 errors: err
             });
         }
-
         res.status(201).json({
             ok: true,
             usuarioGuardado,

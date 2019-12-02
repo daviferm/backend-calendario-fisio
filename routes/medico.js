@@ -49,12 +49,31 @@ app.get('/', function(req, res) {
 
             })
 
-
         })
+})
+app.get('/:id', function(req, res) {
+
+    let id = req.params.id;
+
+    Medico.findById(id, (err, medico) => {
+        if (err) {
+            return res.status(500).json({
+                ok: false,
+                message: 'Error al obtener el médico.',
+                errors: err
+            });
+        }
+
+        res.status(200).json({
+            ok: true,
+            medico
+        })
+
+    })
 })
 
 
-app.post('/', verificaToken, function(req, res) {
+app.post('/', function(req, res) {
 
     var body = req.body;
 
@@ -62,6 +81,7 @@ app.post('/', verificaToken, function(req, res) {
         nombre: body.nombre,
         password: bcrypt.hashSync(body.password, 10),
         email: body.email,
+        color: body.color,
         img: body.img,
         direccion: body.direccion,
         telefono: body.telefono
@@ -106,10 +126,13 @@ app.put('/:id', verificaToken, function(req, res) {
         }
 
         medico.nombre = body.nombre;
+        // medico.password = bcrypt.hashSync(body.password, 10);
         medico.email = body.email;
         medico.img = body.img;
+        medico.color = body.color;
         medico.direccion = body.direccion;
         medico.telefono = body.telefono;
+        medico.check = body.check;
 
         medico.save((err, medicoActualizado) => {
             if (err) {
@@ -128,6 +151,57 @@ app.put('/:id', verificaToken, function(req, res) {
     })
 
 });
+// Cambiar la contraseña del usuario logueado
+app.put('/password/:id', verificaToken, function(req, res) {
+
+    var id = req.params.id;
+    var body = req.body;
+
+    Medico.findById(id, (err, medico) => {
+
+        if (err) {
+            return res.status(500).json({
+                ok: false,
+                message: 'Error al actualizar la contraseña.',
+                errors: err
+            })
+        }
+
+        if (medico.value === null) {
+            return res.status(500).json({
+                ok: false,
+                mensaje: 'No existe un médico con el id: ' + id,
+                errros: { message: 'No existe un médico con este id.' }
+            })
+        }
+        if (!bcrypt.compareSync(body.passwordActual, medico.password)) {
+            return res.status(400).json({
+                ok: false,
+                message: 'La contraseña es incorrecta!!',
+                errors: err
+            });
+
+        }
+
+        medico.password = bcrypt.hashSync(body.password1, 10);
+
+        medico.save((err, medicoActualizado) => {
+            if (err) {
+                return res.status(500).json({
+                    ok: false,
+                    message: 'Error al actualizar el médico.',
+                    errors: err
+                });
+            }
+
+            res.status(201).json({
+                ok: true,
+                medico: medicoActualizado
+            })
+        })
+    })
+
+})
 
 app.delete('/:id', verificaToken, function(req, res) {
 

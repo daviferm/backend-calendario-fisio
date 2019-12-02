@@ -15,18 +15,18 @@ var app = express();
 //=================================================
 app.get('/', function(req, res) {
 
-    let desde = req.query.desde || 0;
-    desde = Number(desde);
+    // let desde = req.query.desde || 0;
+    // desde = Number(desde);
 
-    let limite = req.query.limite || 5;
-    limite = Number(limite);
+    // let limite = req.query.limite || 5;
+    // limite = Number(limite);
 
     Cita.find({})
         .populate('medicoId', 'nombre')
         .populate('pacienteId', 'nombre apellidos')
-        .skip(desde)
-        .limit(limite)
-        .exec((err, cita) => {
+        // .skip(desde)
+        // .limit(limite)
+        .exec((err, citas) => {
 
             if (err) {
                 return res.status(500).json({
@@ -47,7 +47,7 @@ app.get('/', function(req, res) {
 
                 res.status(200).json({
                     ok: true,
-                    cita,
+                    citas,
                     total: conteo
                 })
             })
@@ -58,22 +58,22 @@ app.get('/', function(req, res) {
 //=================================================
 // Petición cita por dia
 //=================================================
-app.get('/:dia', function(req, res) {
+app.get('/dia', function(req, res) {
 
-    let dia = req.params.dia;
+    let dia = req.query.dia;
 
-    let desde = req.query.desde || 0;
-    desde = Number(desde);
+    // let desde = req.query.desde || 0;
+    // desde = Number(desde);
 
-    let limite = req.query.limite || 5;
-    limite = Number(limite);
+    // let limite = req.query.limite || 5;
+    // limite = Number(limite);
 
     Cita.find({ 'dia': dia })
         .populate('medicoId', 'nombre')
-        .populate('pacienteId', 'nombre apellidos')
-        .skip(desde)
-        .limit(limite)
-        .exec((err, cita) => {
+        .populate('pacienteId', 'nombre apellidos telefono img')
+        // .skip(desde)
+        // .limit(limite)
+        .exec((err, citas) => {
 
             if (err) {
                 return res.status(500).json({
@@ -94,7 +94,7 @@ app.get('/:dia', function(req, res) {
 
                 res.status(200).json({
                     ok: true,
-                    cita,
+                    citas,
                     total: conteo
                 })
             })
@@ -103,7 +103,54 @@ app.get('/:dia', function(req, res) {
 });
 
 //=================================================
-// Actualizar un hospital
+// Petición cita de médico
+//=================================================
+app.get('/paciente/:id', function(req, res) {
+
+    let id = req.params.id;
+
+    let desde = req.query.desde || 0;
+    desde = Number(desde);
+
+    let limite = req.query.limite || 5;
+    limite = Number(limite);
+
+    Cita.find({ 'pacienteId': id })
+        .populate('medicoId', 'nombre')
+        .populate('pacienteId', 'nombre apellidos')
+        .skip(desde)
+        .limit(limite)
+        .exec((err, citas) => {
+
+            if (err) {
+                return res.status(500).json({
+                    ok: false,
+                    message: 'Error cargando Citas',
+                    errors: err
+                });
+            }
+
+            Cita.countDocuments((err, conteo) => {
+                if (err) {
+                    return res.status(500).json({
+                        ok: false,
+                        message: 'Error al contar Citas',
+                        errors: err
+                    });
+                }
+
+                res.status(200).json({
+                    ok: true,
+                    citas,
+                    total: conteo
+                })
+            })
+
+        })
+});
+
+//=================================================
+// Actualizar una cita
 //=================================================
 app.put('/:id', verificaToken, function(req, res) {
 
@@ -159,10 +206,10 @@ app.post('/', verificaToken, function(req, res) {
     var cita = new Cita({
         medicoId: body.medicoId,
         pacienteId: body.pacienteId,
+        evento: body.evento,
         dia: body.dia,
         inicio: body.inicio,
-        minutos: body.minutos,
-        duracion: body.duracion,
+        final: body.final,
         color: body.color
     });
 
@@ -171,7 +218,7 @@ app.post('/', verificaToken, function(req, res) {
         if (err) {
             return res.status(500).json({
                 ok: false,
-                message: 'Error guardar el Hospital',
+                message: 'Error guardar el evento',
                 errors: err
             });
         }

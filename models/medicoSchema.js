@@ -18,6 +18,10 @@ var medicoSchema = new Schema({
         unique: true,
         required: false
     },
+    color: {
+        type: String,
+        required: false
+    },
     img: {
         type: String,
         required: false
@@ -28,6 +32,10 @@ var medicoSchema = new Schema({
     },
     telefono: {
         type: String,
+        required: false
+    },
+    check: {
+        type: Boolean,
         required: false
     }
 

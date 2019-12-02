@@ -11,7 +11,12 @@ var citaSchema = new Schema({
     },
     pacienteId: {
         type: Schema.Types.ObjectId,
-        ref: 'Usuario'
+        ref: 'Usuario',
+        required: false
+    },
+    evento: {
+        type: String,
+        required: false
     },
     dia: {
         type: String,
@@ -21,33 +26,20 @@ var citaSchema = new Schema({
         type: String,
         required: [true, 'La hora de inicio es requerida']
     },
-    minutos: {
+    final: {
         type: String,
         required: [true, 'Los minutos de inicio es requerido']
-    },
-    duracion: {
-        type: String,
-        required: [true, 'La duración de la cita es requerida']
     },
     color: {
         type: String,
         required: [true, 'El color de la cita es requerida']
+    },
+    incidencia: {
+        type: String,
+        required: false
     }
 
 }, { collection: 'Citas' });
-
-// interface Citas {
-//     id: string;
-//     atendidoId: string;
-//     pacienteId: string;
-//     dia: string;
-//     inicio: string;
-//     minutos: string;
-//     duracion: string;
-//     color: string;
-//   }
-
-
 
 
 

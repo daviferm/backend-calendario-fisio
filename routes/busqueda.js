@@ -83,24 +83,6 @@ function buscarCitas(busqueda, regex) {
     })
 }
 
-// function buscarMedicos(busqueda, regex) {
-
-//     return new Promise((resolve, reject) => {
-
-//         Medico.find({ nombre: regex })
-//             .populate('usuario', 'nombre email')
-//             .populate('hospital')
-//             .exec((err, medicos) => {
-
-//                 if (err) {
-//                     reject('Error al cargar medicos', err);
-//                 } else {
-//                     resolve(medicos);
-//                 }
-//             })
-//     })
-// }
-
 function buscarUsuario(busqueda, regex) {
 
     return new Promise((resolve, reject) => {
@@ -117,9 +99,5 @@ function buscarUsuario(busqueda, regex) {
             })
     })
 }
-
-
-
-
 
 module.exports = app;

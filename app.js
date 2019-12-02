@@ -1,11 +1,21 @@
 // Requires
+require('./config/config');
 const express = require('express');
 const colors = require('colors');
 const mongoose = require('mongoose');
-
+// var cors = require('cors');
 
 // Inicializar variables
 let app = express();
+
+// CORS PARA CONTROLAR LAS PETICIONES QUE RECIBE NUESTRO BACKEND
+app.use(function(req, res, next) {
+    // res.header("Access-Control-Allow-Headers", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization, token-usuario");
+    res.header("Access-Control-Allow-Methods", "POST, GET, PUT, DELETE, OPTIONS");
+    res.header("Access-Control-Allow-Origin", "*"); // update to match the domain you will make the request from
+    next();
+});
 
 
 // Libreria para manejar pas peticiones post
@@ -28,9 +38,13 @@ const loginRoutes = require('./routes/login');
 
 
 //Conectar la base de datos
-mongoose.connect('mongodb://localhost:27017/fisioCalendarDB', { useNewUrlParser: true }, (err, res) => {
+mongoose.connect(process.env.URLDB, { useNewUrlParser: true, useCreateIndex: true, useFindAndModify: false }, (err, res) => {
 
-    if (err) throw err;
+    if (err) {
+        console.log('ERROR MONGO');
+        return err;
+    }
+    // if (err) throw err;
 
     console.log('Base de datos ONLINE'.green);
 });
@@ -54,6 +68,6 @@ app.use('/', appRoutes);
 
 
 // Escuchar peticiones
-app.listen(3000, () => {
+app.listen(process.env.PORT, () => {
     console.log('Express corriendo en el puerto 3000 ', 'online'.green);
 });
